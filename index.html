@@ -1,0 +1,2615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLPT N4 기출 어휘 마스터 웹 앱</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --secondary: #64748b;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+            --primary-light: #1e1b4b;
+            --secondary: #94a3b8;
+            --success: #10b981;
+            --success-light: #064e3b;
+            --warning: #f59e0b;
+            --warning-light: #78350f;
+            --danger: #ef4444;
+            --danger-light: #7f1d1d;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #cbd5e1;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+            transition: background-color 0.25s, color 0.25s;
+        }
+
+        /* 일본어 신자체 전용 폰트 클래스 */
+        .jp-text {
+            font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif !important;
+            font-feature-settings: "jp04" 1;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            padding: 22px 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .header-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-title p {
+            font-size: 0.88rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(8px);
+            padding: 6px 13px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: white;
+            padding: 7px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.32);
+        }
+
+        .main-container {
+            max-width: 1240px;
+            margin: 20px auto;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 980px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 공통 필터 및 학습 진도율 바 */
+        .filter-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-sub);
+        }
+
+        select.filter-select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-fav-filter {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-main);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-fav-filter.active {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #b45309;
+        }
+
+        /* 상단 실시간 학습 진도율 멀티 프로그레스 바 */
+        .mastery-progress-wrap {
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .mastery-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .mastery-bar-track {
+            width: 100%;
+            height: 12px;
+            background: var(--bg);
+            border-radius: 999px;
+            overflow: hidden;
+            display: flex;
+            border: 1px solid var(--border);
+        }
+
+        .bar-seg-mem { background: var(--success); height: 100%; transition: width 0.3s ease; }
+        .bar-seg-conf { background: var(--warning); height: 100%; transition: width 0.3s ease; }
+        .bar-seg-unmem { background: var(--secondary); opacity: 0.35; height: 100%; transition: width 0.3s ease; }
+
+        /* 탭 네비게이션 */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 플래시카드 스타일 */
+        .fc-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .mode-toggle-btn, .action-btn {
+            padding: 9px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: all 0.15s;
+        }
+
+        .mode-toggle-btn:hover, .action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .fc-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .fc-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.25s ease;
+        }
+
+        .fc-scene {
+            perspective: 1200px;
+            width: 100%;
+            height: 390px;
+            margin-bottom: 18px;
+        }
+
+        .fc-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .fc-card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .fc-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        .fc-face-back {
+            transform: rotateY(180deg);
+            border-color: var(--primary);
+        }
+
+        .fc-top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .badges-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge-year {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .badge-dup {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        [data-theme="dark"] .badge-dup {
+            background: #7f1d1d;
+            color: #fecaca;
+            border-color: #ef4444;
+        }
+
+        .badge-status-memorized { background: var(--success-light); color: #059669; }
+        .badge-status-confusing { background: var(--warning-light); color: #d97706; }
+        .badge-status-unmemorized { background: var(--bg); color: var(--text-sub); border: 1px solid var(--border); }
+
+        .fc-top-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .icon-btn.fav-active {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .fc-center-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .fc-main-text {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.02em;
+        }
+
+        .fc-main-text.meaning-mode {
+            font-size: 2.3rem;
+            color: var(--primary);
+        }
+
+        .fc-hint-box {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-hint {
+            padding: 7px 16px;
+            border-radius: 999px;
+            border: 1px dashed var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hint-revealed {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 4px 18px;
+            border-radius: 999px;
+        }
+
+        .fc-back-kanji {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .fc-back-reading {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .fc-back-kr-pron {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 3px 12px;
+            border-radius: 999px;
+        }
+
+        .fc-back-meaning {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        .fc-example-box {
+            margin-top: 8px;
+            padding: 8px 16px;
+            background: var(--bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-size: 0.92rem;
+            color: var(--text-sub);
+            max-width: 90%;
+        }
+
+        .fc-footer-tip {
+            font-size: 0.78rem;
+            color: var(--secondary);
+        }
+
+        .fc-controls-Area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .fc-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 13px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.15s;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .fc-counter {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-sub);
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .status-btn-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .status-btn {
+            padding: 13px 12px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .status-btn.memorized { background: var(--success-light); color: #059669; }
+        .status-btn.memorized:hover, .status-btn.memorized.active-status { border-color: var(--success); }
+        .status-btn.confusing { background: var(--warning-light); color: #d97706; }
+        .status-btn.confusing:hover, .status-btn.confusing.active-status { border-color: var(--warning); }
+        .status-btn.unmemorized { background: var(--bg); color: var(--text-sub); border: 2px solid var(--border); }
+        .status-btn.unmemorized:hover, .status-btn.unmemorized.active-status { border-color: var(--secondary); }
+
+        /* 탭 2: 단어장 */
+        .vocab-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+            min-width: 240px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 11px 16px 11px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 0.92rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+        }
+
+        .hide-toggles-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toggle-pill-btn {
+            padding: 9px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toggle-pill-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .vocab-table-container {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        table.vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        table.vocab-table th {
+            background: var(--bg);
+            padding: 13px 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        table.vocab-table td {
+            padding: 13px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            font-size: 0.92rem;
+        }
+
+        table.vocab-table tr:hover {
+            background: rgba(99, 102, 241, 0.04);
+        }
+
+        .td-kanji {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .td-reading {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .td-kr-pron {
+            color: var(--text-sub);
+            font-size: 0.82rem;
+        }
+
+        .td-meaning {
+            font-weight: 600;
+        }
+
+        /* 가리기 블러 효과 (마우스 오버 또는 클릭 시 노출) */
+        .masked-cell {
+            filter: blur(6px);
+            user-select: none;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+            background: rgba(100, 116, 139, 0.12);
+            border-radius: 6px;
+            padding: 2px 6px;
+            display: inline-block;
+        }
+
+        .masked-cell:hover, .masked-cell.revealed {
+            filter: blur(0);
+            background: transparent;
+        }
+
+        .mini-status-group {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .mini-status-btn {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-sub);
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .mini-status-btn.active-memorized { background: var(--success); color: white; border-color: var(--success); }
+        .mini-status-btn.active-confusing { background: var(--warning); color: white; border-color: var(--warning); }
+        .mini-status-btn.active-unmemorized { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        /* 탭 3: 4지선다 퀴즈 */
+        .quiz-header-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 6px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .diff-btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+        }
+
+        .diff-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .quiz-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .quiz-meta-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-sub);
+        }
+
+        .quiz-sentence-box {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 24px 20px;
+            margin-bottom: 22px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .quiz-question-type {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .quiz-sentence {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.65;
+        }
+
+        .quiz-target-highlight {
+            color: var(--primary);
+            text-decoration: underline;
+            text-underline-offset: 6px;
+            font-weight: 900;
+            font-size: 1.7rem;
+            padding: 0 4px;
+        }
+
+        .quiz-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .quiz-options-grid { grid-template-columns: 1fr; }
+        }
+
+        .quiz-opt-btn {
+            padding: 15px 18px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.15s;
+        }
+
+        .quiz-opt-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .quiz-opt-btn.correct {
+            border-color: var(--success);
+            background: var(--success-light);
+            color: #059669;
+        }
+
+        .quiz-opt-btn.wrong {
+            border-color: var(--danger);
+            background: var(--danger-light);
+            color: #dc2626;
+        }
+
+        .quiz-feedback-box {
+            display: none;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-top: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .quiz-feedback-box.show {
+            display: block;
+        }
+
+        .auto-confusing-alert {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--warning-light);
+            color: #d97706;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .side-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .side-card h3 {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shortcut-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            color: var(--text-sub);
+        }
+
+        kbd {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            padding: 2px 7px;
+            font-family: monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .backup-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="app-title">
+            <h1>🇯🇵 JLPT N4 기출 어휘 통합 마스터</h1>
+            <p>제공된 기출어휘 총정리 & 확인문제 완전 통합 · 신자체(新字体) 표준 렌더링</p>
+        </div>
+        <div class="header-right">
+            <div class="stats-bar" id="headerStats"></div>
+            <button class="theme-toggle-btn" onclick="toggleDarkMode()" id="themeToggleBtn">
+                🌙 다크 모드
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="main-container">
+    <main>
+        <!-- 공통 필터 및 실시간 진도율 바 -->
+        <section class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <span class="filter-label">📅 출제 연도/분류:</span>
+                    <select id="yearFilter" class="filter-select" onchange="applyFilters()">
+                        <option value="ALL">전체 기출 단어</option>
+                        <option value="DUP">🔥 중복 기출 단어만 모아보기</option>
+                        <option value="21-25년">21~25년 한자읽기 기출</option>
+                        <option value="16-20년">16~20년 표기 기출</option>
+                        <option value="00-15년">00~15년 표기 기출</option>
+                        <option value="기출확인문제">기출 확인문제 핵심 어휘</option>
+                        <option value="기본빈출">기본 빈출 체크 어휘</option>
+                    </select>
+
+                    <span class="filter-label">🧠 암기 상태:</span>
+                    <select id="statusFilter" class="filter-select" onchange="applyFilters()">
+                        <option value="ALL">전체 상태</option>
+                        <option value="unmemorized">📌 미암기 단어</option>
+                        <option value="confusing">❓ 헷갈리는 단어</option>
+                        <option value="memorized">⭕ 외운 단어</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <button id="favFilterBtn" class="btn-fav-filter" onclick="toggleFavFilter()">
+                        <span>★</span> 즐겨찾기 모아보기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 실시간 학습 진도율 프로그레스 바 -->
+            <div class="mastery-progress-wrap">
+                <div class="mastery-labels" id="masteryLabels">
+                    <span>현재 필터 학습 진도율</span>
+                    <span>외움 0% · 헷갈림 0% · 미암기 100%</span>
+                </div>
+                <div class="mastery-bar-track">
+                    <div class="bar-seg-mem" id="barSegMem" style="width: 0%;"></div>
+                    <div class="bar-seg-conf" id="barSegConf" style="width: 0%;"></div>
+                    <div class="bar-seg-unmem" id="barSegUnmem" style="width: 100%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 탭 네비게이션 -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('flashcard')" id="tabBtn-flashcard">
+                🗂️ 탭 1: 플래시카드
+            </button>
+            <button class="tab-btn" onclick="switchTab('vocab')" id="tabBtn-vocab">
+                📖 탭 2: 단어장 목록
+            </button>
+            <button class="tab-btn" onclick="switchTab('quiz')" id="tabBtn-quiz">
+                📝 탭 3: 종합 문제 (4지선다)
+            </button>
+        </nav>
+
+        <!-- 탭 1: 플래시카드 -->
+        <section id="tab-flashcard" class="tab-content active">
+            <div class="fc-toolbar">
+                <button class="mode-toggle-btn" id="fcModeBtn" onclick="toggleFcMode()">
+                    🔄 표시 모드: <strong>기본 (한자 ➔ 뜻/읽기)</strong>
+                </button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="action-btn" onclick="shuffleFlashcards()">
+                        🔀 카드 셔플 (Shuffle)
+                    </button>
+                    <button class="action-btn" onclick="speakCurrentCard()">
+                        🔊 발음 듣기 (V)
+                    </button>
+                </div>
+            </div>
+
+            <div class="fc-progress-bar">
+                <div class="fc-progress-fill" id="fcProgressFill" style="width: 0%;"></div>
+            </div>
+
+            <div id="fcEmptyState" class="empty-state" style="display:none;">
+                <h3>조건에 맞는 단어가 없습니다.</h3>
+                <p style="margin-top:8px;">상단의 연도별/암기 상태별/즐겨찾기 필터를 변경해 보세요.</p>
+            </div>
+
+            <div id="fcMainArea">
+                <div class="fc-scene">
+                    <div class="fc-card" id="fcCard" onclick="flipCard()">
+                        <!-- 카드 앞면 -->
+                        <div class="fc-face fc-face-front">
+                            <div class="fc-top-bar" onclick="event.stopPropagation()">
+                                <div class="badges-wrap" id="fcFrontBadges"></div>
+                                <div class="fc-top-actions">
+                                    <button class="icon-btn" onclick="speakCurrentCard()" title="발음 듣기 (단축키 V)">🔊</button>
+                                    <button class="icon-btn" id="fcFavBtn" onclick="toggleCurrentFav()" title="즐겨찾기 토글 (단축키 S)">☆</button>
+                                </div>
+                            </div>
+
+                            <div class="fc-center-content">
+                                <div class="fc-main-text jp-text" id="fcFrontText" lang="ja"></div>
+                                <div class="fc-hint-box" id="fcHintContainer" onclick="event.stopPropagation()">
+                                    <button class="btn-hint" id="fcHintBtn" onclick="showReadingHint()">💡 요미가나 힌트 보기 (H)</button>
+                                    <div class="hint-revealed jp-text" id="fcHintText" style="display:none;" lang="ja"></div>
+                                </div>
+                            </div>
+
+                            <div class="fc-footer-tip">카드를 클릭하거나 [Space / Enter] 키를 누르면 뒤집힙니다</div>
+                        </div>
+
+                        <!-- 카드 뒷면 -->
+                        <div class="fc-face fc-face-back">
+                            <div class="fc-top-bar" onclick="event.stopPropagation()">
+                                <div class="badges-wrap" id="fcBackBadges"></div>
+                                <div class="fc-top-actions">
+                                    <button class="icon-btn" onclick="speakCurrentCard()" title="일본어 발음 듣기 (V)">🔊</button>
+                                    <button class="icon-btn" id="fcFavBtnBack" onclick="toggleCurrentFav()" title="즐겨찾기 토글 (S)">☆</button>
+                                </div>
+                            </div>
+
+                            <div class="fc-center-content">
+                                <div class="fc-back-kanji jp-text" id="fcBackKanji" style="display:none;" lang="ja"></div>
+                                <div class="fc-back-reading jp-text" id="fcBackReading" lang="ja"></div>
+                                <div class="fc-back-kr-pron" id="fcBackKrPron"></div>
+                                <div class="fc-back-meaning" id="fcBackMeaning"></div>
+                                <div class="fc-example-box jp-text" id="fcBackExample" lang="ja"></div>
+                            </div>
+
+                            <div class="fc-footer-tip">하단 버튼 또는 숫자키 [1:외움], [2:헷갈림], [3:미암기]로 상태를 변경하세요</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fc-controls-Area">
+                    <div class="fc-nav-row">
+                        <button class="nav-btn" onclick="prevCard()">◀ 이전 카드 (←)</button>
+                        <div class="fc-counter" id="fcCounter">1 / 1</div>
+                        <button class="nav-btn" onclick="nextCard()">다음 카드 (→) ▶</button>
+                    </div>
+
+                    <div class="status-btn-group">
+                        <button class="status-btn memorized" id="btnStatusMemorized" onclick="setCardStatusAndNext('memorized')">
+                            ⭕ 외움 (1)
+                        </button>
+                        <button class="status-btn confusing" id="btnStatusConfusing" onclick="setCardStatusAndNext('confusing')">
+                            ❓ 헷갈림 (2)
+                        </button>
+                        <button class="status-btn unmemorized" id="btnStatusUnmemorized" onclick="setCardStatusAndNext('unmemorized')">
+                            📌 미암기 (3)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 탭 2: 단어장 -->
+        <section id="tab-vocab" class="tab-content">
+            <div class="vocab-toolbar">
+                <div class="search-input-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="vocabSearchInput" class="search-input jp-text" placeholder="한자, 요미가나, 한국어 발음, 뜻으로 실시간 검색..." oninput="renderVocabTable()">
+                </div>
+                <div class="hide-toggles-wrap">
+                    <button class="toggle-pill-btn" id="btnHideReading" onclick="toggleVocabMask('reading')">
+                        🙈 요미가나 가리기
+                    </button>
+                    <button class="toggle-pill-btn" id="btnHideMeaning" onclick="toggleVocabMask('meaning')">
+                        🙈 뜻 가리기
+                    </button>
+                    <span style="font-weight:800; color:var(--text-sub); font-size:0.88rem; padding:0 6px;" id="vocabCountLabel">
+                        총 0개
+                    </span>
+                </div>
+            </div>
+
+            <div class="vocab-table-container">
+                <table class="vocab-table">
+                    <thead>
+                        <tr>
+                            <th style="width:46px; text-align:center;">★</th>
+                            <th style="width:46px; text-align:center;">🔊</th>
+                            <th>한자 표기</th>
+                            <th>요미가나 (한국어 발음)</th>
+                            <th>한국어 뜻</th>
+                            <th>기출 연도 / 중복 배지</th>
+                            <th style="text-align:center;">암기 상태</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocabTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 탭 3: 종합 문제 (4지선다 퀴즈) -->
+        <section id="tab-quiz" class="tab-content">
+            <div class="quiz-header-card">
+                <div>
+                    <div style="font-size:0.82rem; font-weight:700; color:var(--text-sub); margin-bottom:6px;">
+                        난이도 선택 (현재 필터링된 단어 범위 내에서 출제)
+                    </div>
+                    <div class="difficulty-selector">
+                        <button class="diff-btn active" id="diffEasyBtn" onclick="setQuizDifficulty('easy')">
+                            🌱 쉬운 난이도 (Easy: 뜻/명확한 읽기)
+                        </button>
+                        <button class="diff-btn" id="diffHardBtn" onclick="setQuizDifficulty('hard')">
+                            🔥 어려운 난이도 (Hard: JLPT 실전 함정 요미가나)
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <div id="quizScoreBadge" style="font-weight:800; color:var(--primary); font-size:0.95rem;">
+                        정답률: 0 / 0 (0%)
+                    </div>
+                    <button class="action-btn" onclick="startNewQuizSession(false)">
+                        🔄 새 퀴즈 시작
+                    </button>
+                </div>
+            </div>
+
+            <div id="quizMainArea" class="quiz-card"></div>
+        </section>
+    </main>
+
+    <!-- 사이드바 (단축키 안내 & 데이터 백업/복구) -->
+    <aside class="sidebar">
+        <div class="side-card">
+            <h3>⌨️ 키보드 단축키 가이드</h3>
+            <ul class="shortcut-list">
+                <li class="shortcut-item"><span>카드 뒤집기</span><span><kbd>Space</kbd> / <kbd>Enter</kbd></span></li>
+                <li class="shortcut-item"><span>이전 / 다음 카드</span><span><kbd>←</kbd> / <kbd>→</kbd></span></li>
+                <li class="shortcut-item"><span>요미가나 힌트</span><span><kbd>H</kbd></span></li>
+                <li class="shortcut-item"><span>일본어 발음 듣기</span><span><kbd>V</kbd></span></li>
+                <li class="shortcut-item"><span>[외움] 변경 후 다음</span><span><kbd>1</kbd></span></li>
+                <li class="shortcut-item"><span>[헷갈림] 변경 후 다음</span><span><kbd>2</kbd></span></li>
+                <li class="shortcut-item"><span>[미암기] 변경 후 다음</span><span><kbd>3</kbd></span></li>
+                <li class="shortcut-item"><span>즐겨찾기(★) 토글</span><span><kbd>S</kbd></span></li>
+            </ul>
+        </div>
+
+        <div class="side-card">
+            <h3>💾 학습 데이터 백업 / 복구</h3>
+            <p style="font-size:0.82rem; color:var(--text-sub); margin-bottom:12px;">
+                암기 상태와 즐겨찾기 기록은 브라우저에 자동 저장되며, JSON 파일로 내보내거나 불러올 수 있습니다.
+            </p>
+            <div class="backup-btn-group">
+                <button class="action-btn" style="width:100%; justify-content:center;" onclick="exportStudyData()">
+                    📥 학습 기록 JSON 내보내기
+                </button>
+                <button class="action-btn" style="width:100%; justify-content:center;" onclick="document.getElementById('importFileInput').click()">
+                    📤 학습 기록 JSON 불러오기
+                </button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importStudyData(event)">
+                <button class="action-btn" style="width:100%; justify-content:center; color:var(--danger); border-color:#fca5a5; margin-top:4px;" onclick="resetAllUserData()">
+                    🗑️ 학습 기록 전체 초기화
+                </button>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+/* =========================================================================
+   1. 제공된 모든 이미지 및 노트의 기출 어휘 데이터 (중복 포함 원본 배열)
+   - 동일한 (한자 + 요미가나) 단어는 초기화 시 자동 병합되며,
+     여러 섹션/연도에 출제된 단어는 years 배열에 모두 누적되어 중복 배지로 표시됩니다.
+   ========================================================================= */
+const RAW_VOCAB_SOURCES = [
+    // [1] 한자읽기 기출어휘 (21-25년) - p.15, p.35
+    { k: "赤い", r: "あかい", m: "빨갛다", y: "21-25년" },
+    { k: "集める", r: "あつめる", m: "모으다", y: "21-25년" },
+    { k: "姉", r: "あね", m: "언니, 누나", y: "21-25년" },
+    { k: "以上", r: "いじょう", m: "이상", y: "21-25년" },
+    { k: "一度", r: "いちど", m: "한 번", y: "21-25년" },
+    { k: "糸", r: "いと", m: "실", y: "21-25년" },
+    { k: "色", r: "いろ", m: "색", y: "21-25년" },
+    { k: "歌", r: "うた", m: "노래", y: "21-25년" },
+    { k: "海", r: "うみ", m: "바다", y: "21-25년" },
+    { k: "営業", r: "えいぎょう", m: "영업", y: "21-25년" },
+    { k: "行う", r: "おこなう", m: "행하다, 개최하다", y: "21-25년" },
+    { k: "教える", r: "おしえる", m: "가르치다", y: "21-25년" },
+    { k: "押す", r: "おす", m: "누르다, 밀다", y: "21-25년" },
+    { k: "お姉さん", r: "おねえさん", m: "언니, 누나", y: "21-25년" },
+    { k: "親指", r: "おやゆび", m: "엄지손가락", y: "21-25년" },
+    { k: "泳ぐ", r: "およぐ", m: "헤엄치다", y: "21-25년" },
+    { k: "会場", r: "かいじょう", m: "회장, 행사장", y: "21-25년" },
+    { k: "数える", r: "かぞえる", m: "세다", y: "21-25년" },
+    { k: "紙", r: "かみ", m: "종이", y: "21-25년" },
+    { k: "体", r: "からだ", m: "몸, 신체", y: "21-25년" },
+    { k: "軽い", r: "かるい", m: "가볍다", y: "21-25년" },
+    { k: "考える", r: "かんがえる", m: "생각하다", y: "21-25년" },
+    { k: "決まる", r: "きまる", m: "결정되다", y: "21-25년" },
+    { k: "区", r: "く", m: "구(행정구역 단위)", y: "21-25년" },
+    { k: "薬", r: "くすり", m: "약", y: "21-25년" },
+    { k: "暗い", r: "くらい", m: "어둡다", y: "21-25년" },
+    { k: "工事", r: "こうじ", m: "공사", y: "21-25년" },
+    { k: "心", r: "こころ", m: "마음", y: "21-25년" },
+    { k: "答える", r: "こたえる", m: "대답하다", y: "21-25년" },
+    { k: "今度", r: "こんど", m: "이번, 다음", y: "21-25년" },
+    { k: "夏", r: "なつ", m: "여름", y: "21-25년" },
+    { k: "日記", r: "にっき", m: "일기", y: "21-25년" },
+    { k: "二台", r: "にだい", m: "두 대(기계/차량)", y: "21-25년" },
+    { k: "乗る", r: "のる", m: "타다", y: "21-25년" },
+    { k: "運ぶ", r: "はこぶ", m: "운반하다, 옮기다", y: "21-25년" },
+    { k: "始める", r: "はじめる", m: "시작하다", y: "21-25년" },
+    { k: "場所", r: "ばしょ", m: "장소", y: "21-25년" },
+    { k: "走る", r: "はしる", m: "달리다", y: "21-25년" },
+    { k: "働く", r: "はたらく", m: "일하다", y: "21-25년" },
+    { k: "発音", r: "はつおん", m: "발음", y: "21-25년" },
+    { k: "花", r: "はな", m: "꽃", y: "21-25년" },
+    { k: "春", r: "はる", m: "봄", y: "21-25년" },
+    { k: "早く", r: "はやく", m: "일찍, 빨리", y: "21-25년" },
+    { k: "光", r: "ひかり", m: "빛", y: "21-25년" },
+    { k: "光る", r: "ひかる", m: "빛나다", y: "21-25년" },
+    { k: "低い", r: "ひくい", m: "낮다", y: "21-25년" },
+    { k: "病院", r: "びょういん", m: "병원", y: "21-25년" },
+    { k: "昼", r: "ひる", m: "낮", y: "21-25년" },
+    { k: "広い", r: "ひろい", m: "넓다", y: "21-25년" },
+    { k: "服", r: "ふく", m: "옷", y: "21-25년" },
+    { k: "不便だ", r: "ふべんだ", m: "불편하다", y: "21-25년" },
+    { k: "冬", r: "ふゆ", m: "겨울", y: "21-25년" },
+    { k: "古い", r: "ふるい", m: "오래되다, 낡다", y: "21-25년" },
+    { k: "文", r: "ぶん", m: "문장", y: "21-25년" },
+    { k: "文学", r: "ぶんがく", m: "문학", y: "21-25년" },
+    { k: "勉強", r: "べんきょう", m: "공부", y: "21-25년" },
+    { k: "毎朝", r: "まいあさ", m: "매일 아침", y: "21-25년" },
+    { k: "町", r: "まち", m: "도시, 마을", y: "21-25년" },
+    { k: "待つ", r: "まつ", m: "기다리다", y: "21-25년" },
+    { k: "間に合う", r: "まにあう", m: "시간에 맞추다", y: "21-25년" },
+    { k: "短い", r: "みじかい", m: "짧다", y: "21-25년" },
+    { k: "港", r: "みなと", m: "항구", y: "21-25년" },
+    { k: "村", r: "むら", m: "마을, 시골", y: "21-25년" },
+    { k: "目", r: "め", m: "눈", y: "21-25년" },
+    { k: "持つ", r: "もつ", m: "들다, 가지다", y: "21-25년" },
+    { k: "森", r: "もり", m: "숲", y: "21-25년" },
+    { k: "門", r: "もん", m: "문", y: "21-25년" },
+
+    // [2] 표기 기출어휘 (16-20년) - p.44, p.50
+    { k: "寒い", r: "さむい", m: "춥다", y: "16-20년" },
+    { k: "閉める", r: "しめる", m: "닫다", y: "16-20년" },
+    { k: "食堂", r: "しょくどう", m: "식당", y: "16-20년" },
+    { k: "女性", r: "じょせい", m: "여성", y: "16-20년" },
+    { k: "調べる", r: "しらべる", m: "조사하다, 찾아보다", y: "16-20년" },
+    { k: "白い", r: "しろい", m: "하얗다, 희다", y: "16-20년" },
+    { k: "親切だ", r: "しんせつだ", m: "친절하다", y: "16-20년" },
+    { k: "説明", r: "せつめい", m: "설명", y: "16-20년" },
+    { k: "作る", r: "つくる", m: "만들다", y: "16-20년" },
+    { k: "遠い", r: "とおい", m: "멀다", y: "16-20년" },
+    { k: "特別だ", r: "とくべつだ", m: "특별하다", y: "16-20년" },
+    { k: "日記", r: "にっき", m: "일기", y: "16-20년" },
+    { k: "入院", r: "にゅういん", m: "입원", y: "16-20년" },
+    { k: "青い", r: "あおい", m: "파랗다", y: "16-20년" },
+    { k: "赤い", r: "あかい", m: "빨갛다", y: "16-20년" },
+    { k: "集まる", r: "あつまる", m: "모이다", y: "16-20년" },
+    { k: "洗う", r: "あらう", m: "씻다", y: "16-20년" },
+    { k: "歩く", r: "あるく", m: "걷다", y: "16-20년" },
+    { k: "医者", r: "いしゃ", m: "의사", y: "16-20년" },
+    { k: "動く", r: "うごく", m: "움직이다", y: "16-20년" },
+    { k: "売る", r: "うる", m: "팔다", y: "16-20년" },
+    { k: "営業", r: "えいぎょう", m: "영업", y: "16-20년" },
+    { k: "屋上", r: "おくじょう", m: "옥상", y: "16-20년" },
+    { k: "貸す", r: "かす", m: "빌려주다", y: "16-20년" },
+    { k: "軽い", r: "かるい", m: "가볍다", y: "16-20년" },
+    { k: "帰国", r: "きこく", m: "귀국", y: "16-20년" },
+    { k: "暗い", r: "くらい", m: "어둡다", y: "16-20년" },
+    { k: "黒い", r: "くろい", m: "검다", y: "16-20년" },
+    { k: "計画", r: "けいかく", m: "계획", y: "16-20년" },
+    { k: "経験", r: "けいけん", m: "경험", y: "16-20년" },
+    { k: "交通", r: "こうつう", m: "교통", y: "16-20년" },
+    { k: "声", r: "こえ", m: "목소리", y: "16-20년" },
+    { k: "氷", r: "こおり", m: "얼음", y: "16-20년" },
+    { k: "試合", r: "しあい", m: "시합, 경기", y: "16-20년" },
+    { k: "質問", r: "しつもん", m: "질문", y: "16-20년" },
+    { k: "出発", r: "しゅっぱつ", m: "출발", y: "16-20년" },
+    { k: "食料品", r: "しょくりょうひん", m: "식료품", y: "16-20년" },
+    { k: "好きだ", r: "すきだ", m: "좋아하다", y: "16-20년" },
+    { k: "進む", r: "すすむ", m: "나아가다, 진행되다", y: "16-20년" },
+
+    // [3] 표기 기출어휘 (00-15년) - p.56, p.57, p.58
+    { k: "会う", r: "あう", m: "만나다", y: "00-15년" },
+    { k: "青い", r: "あおい", m: "파랗다", y: "00-15년" },
+    { k: "明るい", r: "あかるい", m: "밝다", y: "00-15년" },
+    { k: "秋", r: "あき", m: "가을", y: "00-15년" },
+    { k: "開ける", r: "あける", m: "열다", y: "00-15년" },
+    { k: "足", r: "あし", m: "발, 다리", y: "00-15년" },
+    { k: "暑い", r: "あつい", m: "덥다", y: "00-15년" },
+    { k: "集まる", r: "あつまる", m: "모이다", y: "00-15년" },
+    { k: "姉", r: "あね", m: "언니, 누나", y: "00-15년" },
+    { k: "洗う", r: "あらう", m: "씻다", y: "00-15년" },
+    { k: "歩く", r: "あるく", m: "걷다", y: "00-15년" },
+    { k: "言う", r: "いう", m: "말하다", y: "00-15년" },
+    { k: "行き方", r: "いきかた", m: "가는 방법", y: "00-15년" },
+    { k: "池", r: "いけ", m: "연못", y: "00-15년" },
+    { k: "医者", r: "いしゃ", m: "의사", y: "00-15년" },
+    { k: "以上", r: "いじょう", m: "이상", y: "00-15년" },
+    { k: "犬", r: "いぬ", m: "개, 강아지", y: "00-15년" },
+    { k: "意味", r: "いみ", m: "의미, 뜻", y: "00-15년" },
+    { k: "歌", r: "うた", m: "노래", y: "00-15년" },
+    { k: "海", r: "うみ", m: "바다", y: "00-15년" },
+    { k: "売る", r: "うる", m: "팔다", y: "00-15년" },
+    { k: "運転", r: "うんてん", m: "운전", y: "00-15년" },
+    { k: "映画館", r: "えいがかん", m: "영화관", y: "00-15년" },
+    { k: "英語", r: "えいご", m: "영어", y: "00-15년" },
+    { k: "屋上", r: "おくじょう", m: "옥상", y: "00-15년" },
+    { k: "送る", r: "おくる", m: "보내다", y: "00-15년" },
+    { k: "教える", r: "おしえる", m: "가르치다", y: "00-15년" },
+    { k: "音", r: "おと", m: "소리", y: "00-15년" },
+    { k: "弟", r: "おとうと", m: "남동생", y: "00-15년" },
+    { k: "同じだ", r: "おなじだ", m: "같다", y: "00-15년" },
+    { k: "思い出す", r: "おもいだす", m: "떠올리다, 생각해 내다", y: "00-15년" },
+    { k: "思う", r: "おもう", m: "생각하다", y: "00-15년" },
+    { k: "終わる", r: "おわる", m: "끝나다", y: "00-15년" },
+    { k: "買う", r: "かう", m: "사다", y: "00-15년" },
+    { k: "帰る", r: "かえる", m: "돌아가다, 귀가하다", y: "00-15년" },
+    { k: "顔", r: "かお", m: "얼굴", y: "00-15년" },
+    { k: "書き方", r: "かきかた", m: "쓰는 법", y: "00-15년" },
+    { k: "貸す", r: "かす", m: "빌려주다", y: "00-15년" },
+    { k: "風", r: "かぜ", m: "바람", y: "00-15년" },
+    { k: "家族", r: "かぞく", m: "가족", y: "00-15년" },
+    { k: "借りる", r: "かりる", m: "빌리다", y: "00-15년" },
+    { k: "代わり", r: "かわり", m: "대신", y: "00-15년" },
+    { k: "考える", r: "かんがえる", m: "생각하다", y: "00-15년" },
+    { k: "漢字", r: "かんじ", m: "한자", y: "00-15년" },
+    { k: "牛肉", r: "ぎゅうにく", m: "소고기", y: "00-15년" },
+    { k: "教室", r: "きょうしつ", m: "교실", y: "00-15년" },
+    { k: "薬", r: "くすり", m: "약", y: "00-15년" },
+    { k: "暗い", r: "くらい", m: "어둡다", y: "00-15년" },
+    { k: "経験", r: "けいけん", m: "경험", y: "00-15년" },
+    { k: "研究", r: "けんきゅう", m: "연구", y: "00-15년" },
+    { k: "交通", r: "こうつう", m: "교통", y: "00-15년" },
+    { k: "答える", r: "こたえる", m: "대답하다", y: "00-15년" },
+    { k: "小鳥", r: "ことり", m: "작은 새", y: "00-15년" },
+    { k: "寒い", r: "さむい", m: "춥다", y: "00-15년" },
+    { k: "自転車", r: "じてんしゃ", m: "자전거", y: "00-15년" },
+    { k: "自動車", r: "じどうしゃ", m: "자동차", y: "00-15년" },
+    { k: "死ぬ", r: "しぬ", m: "죽다", y: "00-15년" },
+    { k: "市民", r: "しみん", m: "시민", y: "00-15년" },
+    { k: "写真", r: "しゃしん", m: "사진", y: "00-15년" },
+    { k: "住所", r: "じゅうしょ", m: "주소", y: "00-15년" },
+    { k: "授業", r: "じゅぎょう", m: "수업", y: "00-15년" },
+    { k: "食堂", r: "しょくどう", m: "식당", y: "00-15년" },
+    { k: "調べる", r: "しらべる", m: "조사하다", y: "00-15년" },
+    { k: "知る", r: "しる", m: "알다", y: "00-15년" },
+    { k: "親切だ", r: "しんせつだ", m: "친절하다", y: "00-15년" },
+    { k: "好きだ", r: "すきだ", m: "좋아하다", y: "00-15년" },
+    { k: "住む", r: "すむ", m: "살다, 거주하다", y: "00-15년" },
+    { k: "先週", r: "せんしゅう", m: "지난주", y: "00-15년" },
+    { k: "台所", r: "だいどころ", m: "부엌", y: "00-15년" },
+    { k: "台風", r: "たいふう", m: "태풍", y: "00-15년" },
+    { k: "正しい", r: "ただしい", m: "바르다, 옳다", y: "00-15년" },
+    { k: "建てる", r: "たてる", m: "세우다, 짓다", y: "00-15년" },
+    { k: "近く", r: "ちかく", m: "근처, 가까움", y: "00-15년" },
+    { k: "地図", r: "ちず", m: "지도", y: "00-15년" },
+    { k: "使う", r: "つかう", m: "사용하다, 쓰다", y: "00-15년" },
+    { k: "作る", r: "つくる", m: "만들다", y: "00-15년" },
+    { k: "店員", r: "てんいん", m: "점원", y: "00-15년" },
+    { k: "〜度", r: "ど", m: "~번, ~도(횟수/온도)", y: "00-15년" },
+    { k: "遠く", r: "とおく", m: "멀리, 먼 곳", y: "00-15년" },
+    { k: "時計", r: "とけい", m: "시계", y: "00-15년" },
+    { k: "土曜日", r: "どようび", m: "토요일", y: "00-15년" },
+    { k: "夏", r: "なつ", m: "여름", y: "00-15년" },
+    { k: "習う", r: "ならう", m: "배우다", y: "00-15년" },
+    { k: "眠い", r: "ねむい", m: "졸리다", y: "00-15년" },
+    { k: "乗る", r: "のる", m: "타다", y: "00-15년" },
+    { k: "始める", r: "はじめる", m: "시작하다", y: "00-15년" },
+    { k: "場所", r: "ばしょ", m: "장소", y: "00-15년" },
+    { k: "走る", r: "はしる", m: "달리다", y: "00-15년" },
+    { k: "働く", r: "はたらく", m: "일하다", y: "00-15년" },
+    { k: "話", r: "はなし", m: "이야기", y: "00-15년" },
+    { k: "早く", r: "はやく", m: "일찍, 빨리", y: "00-15년" },
+    { k: "林", r: "はやし", m: "수풀, 작은 숲", y: "00-15년" },
+    { k: "光", r: "ひかり", m: "빛", y: "00-15년" },
+    { k: "引く", r: "ひく", m: "끌다, 당기다", y: "00-15년" },
+    { k: "病院", r: "びょういん", m: "병원", y: "00-15년" },
+    { k: "開く", r: "ひらく", m: "열리다, 열다", y: "00-15년" },
+    { k: "昼休み", r: "ひるやすみ", m: "점심시간", y: "00-15년" },
+    { k: "広い", r: "ひろい", m: "넓다", y: "00-15년" },
+    { k: "服", r: "ふく", m: "옷", y: "00-15년" },
+    { k: "冬", r: "ふゆ", m: "겨울", y: "00-15년" },
+    { k: "古い", r: "ふるい", m: "오래되다, 낡다", y: "00-15년" },
+    { k: "文", r: "ぶん", m: "문장", y: "00-15년" },
+    { k: "便利だ", r: "べんりだ", m: "편리하다", y: "00-15년" },
+    { k: "本屋", r: "ほんや", m: "서점", y: "00-15년" },
+
+    // [4] 기출어휘 확인문제 (p.21, p.22, p.46, p.49, p.53, p.55, p.61, p.65)
+    { k: "近い", r: "ちかい", m: "가깝다", y: "기출확인문제" },
+    { k: "使う", r: "つかう", m: "사용하다, 쓰다", y: "기출확인문제" },
+    { k: "光る", r: "ひかる", m: "빛나다", y: "기출확인문제" },
+    { k: "都合", r: "つごう", m: "사정, 형편", y: "기출확인문제" },
+    { k: "強い", r: "つよい", m: "강하다", y: "기출확인문제" },
+    { k: "冬", r: "ふゆ", m: "겨울", y: "기출확인문제" },
+    { k: "夏", r: "なつ", m: "여름", y: "기출확인문제" },
+    { k: "習う", r: "ならう", m: "배우다", y: "기출확인문제" },
+    { k: "親指", r: "おやゆび", m: "엄지손가락", y: "기출확인문제" },
+    { k: "入院", r: "にゅういん", m: "입원", y: "기출확인문제" },
+    { k: "乗る", r: "のる", m: "타다", y: "기출확인문제" },
+    { k: "早い", r: "はやい", m: "빠르다, 이르다", y: "기출확인문제" },
+    { k: "引く", r: "ひく", m: "끌다, (기타를) 치다", y: "기출확인문제" },
+    { k: "広い", r: "ひろい", m: "넓다", y: "기출확인문제" },
+    { k: "船", r: "ふね", m: "배(선박)", y: "기출확인문제" },
+    { k: "遠い", r: "とおい", m: "멀다", y: "기출확인문제" },
+    { k: "持つ", r: "もつ", m: "들다, 가지다", y: "기출확인문제" },
+    { k: "集める", r: "あつめる", m: "모으다", y: "기출확인문제" },
+    { k: "野菜", r: "やさい", m: "채소, 야채", y: "기출확인문제" },
+    { k: "予習", r: "よしゅう", m: "예습", y: "기출확인문제" },
+    { k: "赤い", r: "あかい", m: "빨갛다", y: "기출확인문제" },
+    { k: "朝", r: "あさ", m: "아침", y: "기출확인문제" },
+    { k: "暑い", r: "あつい", m: "덥다", y: "기출확인문제" },
+    { k: "兄", r: "あに", m: "형, 오빠", y: "기출확인문제" },
+    { k: "以下", r: "いか", m: "이하", y: "기출확인문제" },
+    { k: "妹", r: "いもうと", m: "여동생", y: "기출확인문제" },
+    { k: "動く", r: "うごく", m: "움직이다", y: "기출확인문제" },
+    { k: "運動", r: "うんどう", m: "운동", y: "기출확인문제" },
+    { k: "映画", r: "えいが", m: "영화", y: "기출확인문제" },
+    { k: "音", r: "おと", m: "소리", y: "기출확인문제" },
+    { k: "運ぶ", r: "はこぶ", m: "운반하다, 옮기다", y: "기출확인문제" },
+    { k: "走る", r: "はしる", m: "달리다", y: "기출확인문제" },
+    { k: "待つ", r: "まつ", m: "기다리다", y: "기출확인문제" },
+    { k: "夜", r: "よる", m: "밤", y: "기출확인문제" },
+    { k: "弱い", r: "よわい", m: "약하다", y: "기출확인문제" },
+    { k: "反対", r: "はんたい", m: "반대", y: "기출확인문제" },
+    { k: "運転", r: "うんてん", m: "운전", y: "기출확인문제" },
+    { k: "終わる", r: "おわる", m: "끝나다", y: "기출확인문제" },
+    { k: "味", r: "あじ", m: "맛", y: "기출확인문제" },
+    { k: "屋上", r: "おくじょう", m: "옥상", y: "기출확인문제" },
+    { k: "貸す", r: "かす", m: "빌려주다", y: "기출확인문제" },
+    { k: "食料品", r: "しょくりょうひん", m: "식료품", y: "기출확인문제" },
+    { k: "林", r: "はやし", m: "수풀, 작은 숲", y: "기출확인문제" },
+    { k: "青い", r: "あおい", m: "파랗다", y: "기출확인문제" },
+    { k: "氷", r: "こおり", m: "얼음", y: "기출확인문제" },
+    { k: "旅館", r: "りょかん", m: "여관, 료칸", y: "기출확인문제" },
+    { k: "営業", r: "えいぎょう", m: "영업", y: "기출확인문제" },
+    { k: "鳥", r: "とり", m: "새", y: "기출확인문제" },
+    { k: "調べる", r: "しらべる", m: "조사하다, 찾아보다", y: "기출확인문제" },
+    { k: "特別だ", r: "とくべつだ", m: "특별하다", y: "기출확인문제" },
+    { k: "試合", r: "しあい", m: "시합, 경기", y: "기출확인문제" },
+    { k: "経験", r: "けいけん", m: "경험", y: "기출확인문제" },
+    { k: "医者", r: "いしゃ", m: "의사", y: "기출확인문제" },
+    { k: "便利だ", r: "べんりだ", m: "편리하다", y: "기출확인문제" },
+    { k: "昼ご飯", r: "ひるごはん", m: "점심식사", y: "기출확인문제" },
+    { k: "黒い", r: "くろい", m: "검다", y: "기출확인문제" },
+    { k: "眠い", r: "ねむい", m: "졸리다", y: "기출확인문제" },
+    { k: "考える", r: "かんがえる", m: "생각하다", y: "기출확인문제" },
+    { k: "昼休み", r: "ひるやすみ", m: "점심시간", y: "기출확인문제" },
+    { k: "借りる", r: "かりる", m: "빌리다", y: "기출확인문제" },
+    { k: "映画館", r: "えいがかん", m: "영화관", y: "기출확인문제" },
+    { k: "歌", r: "うた", m: "노래", y: "기출확인문제" },
+    { k: "先週", r: "せんしゅう", m: "지난주", y: "기출확인문제" },
+    { k: "光", r: "ひかり", m: "빛", y: "기출확인문제" },
+    { k: "思う", r: "おもう", m: "생각하다", y: "기출확인문제" },
+    { k: "教える", r: "おしえる", m: "가르치다", y: "기출확인문제" },
+    { k: "思い出す", r: "おもいだす", m: "떠올리다, 생각해 내다", y: "기출확인문제" },
+    { k: "開ける", r: "あける", m: "열다", y: "기출확인문제" },
+    { k: "授業", r: "じゅぎょう", m: "수업", y: "기출확인문제" },
+    { k: "夕方", r: "ゆうがた", m: "저녁때, 해질녘", y: "기출확인문제" },
+    { k: "風", r: "かぜ", m: "바람", y: "기출확인문제" },
+
+    // [5] 노트 기본빈출 어휘 (N4 정리 소스 1)
+    { k: "社会", r: "しゃかい", m: "사회", y: "기본빈출" },
+    { k: "小説", r: "しょうせつ", m: "소설", y: "기본빈출" },
+    { k: "食料品", r: "しょくりょうひん", m: "식료품", y: "기본빈출" },
+    { k: "人口", r: "じんこう", m: "인구", y: "기본빈출" },
+    { k: "新聞社", r: "しんぶんしゃ", m: "신문사", y: "기본빈출" },
+    { k: "親切だ", r: "しんせつだ", m: "친절하다", y: "기본빈출" },
+    { k: "水道", r: "すいどう", m: "수도", y: "기본빈출" },
+    { k: "進む", r: "すすむ", m: "나아가다, 진행되다", y: "기본빈출" },
+    { k: "世界", r: "せかい", m: "세계", y: "기본빈출" },
+    { k: "説明", r: "せつめい", m: "설명", y: "기본빈출" }
+];
+
+/* =========================================================================
+   2. 실전 문맥 예문 데이터베이스 (기존 문제집과 다른 새로운 실전 문맥 제공)
+   ========================================================================= */
+const CUSTOM_CONTEXT_MAP = {
+    "赤い": { s: "誕生日に 友だちから ＿＿ かばんを もらいました。", kr: "생일에 친구로부터 빨간 가방을 받았습니다." },
+    "集める": { s: "世界中の めずらしい コインを ＿＿ のが 趣味です。", kr: "세계 각국의 희귀한 동전을 모으는 것이 취미입니다." },
+    "姉": { s: "わたしの ＿＿ は 来月から 東京の 銀行で 働きます。", kr: "나의 언니(누나)는 다음 달부터 도쿄 은행에서 일합니다." },
+    "以上": { s: "テストの 点数が 80点 ＿＿ なら 合格です。", kr: "테스트 점수가 80점 이상이면 합격입니다." },
+    "営業": { s: "この デパートは 日曜日も 夜9時まで ＿＿ して います。", kr: "이 백화점은 일요일도 밤 9시까지 영업하고 있습니다." },
+    "教える": { s: "後輩に 新しい 機械の 使い方を ＿＿ あげました。", kr: "후배에게 새로운 기계 사용법을 가르쳐 주었습니다." },
+    "親指": { s: "ドアに 右手の ＿＿ を はさんで けがを しました。", kr: "문에 오른손 엄지손가락이 끼어 다쳤습니다." },
+    "軽い": { s: "この ノートパソコンは とても ＿＿ ので、持ち運びに 便利です。", kr: "이 노트북은 매우 가벼워서 휴대하기 편리합니다." },
+    "考える": { s: "将来の 進路に ついて じっくり ＿＿ 時間が 必要です。", kr: "장래 진로에 대해 곰곰이 생각할 시간이 필요합니다." },
+    "薬": { s: "のどが 痛いので、食後に 病院の ＿＿ を 飲みました。", kr: "목이 아파서 식후에 병원 약을 먹었습니다." },
+    "暗い": { s: "外が だんだん ＿＿ なって きたので、早く 帰りましょう。", kr: "밖이 점점 어두워져서 빨리 돌아갑시다." },
+    "答える": { s: "先生の 質問に 大きな 声で はっきり ＿＿ ました。", kr: "선생님의 질문에 큰 소리로 또렷하게 대답했습니다." },
+    "夏": { s: "今年の ＿＿ は 家族と いっしょに 北海道へ 旅行します。", kr: "올해 여름은 가족과 함께 홋카이도로 여행합니다." },
+    "日記": { s: "日本語の 練習の ために、毎日 寝る 前に ＿＿ を 書いて います。", kr: "일본어 연습을 위해 매일 자기 전에 일기를 쓰고 있습니다." },
+    "乗る": { s: "急いで いたので、駅の 前から タクシーに ＿＿ ました。", kr: "급해서 역 앞에서 택시를 탔습니다." },
+    "運ぶ": { s: "引っ越しの 荷物を トラックで 新しい 家まで ＿＿ ました。", kr: "이사 짐을 트럭으로 새집까지 운반했습니다." },
+    "始める": { s: "健康の ために 今週から ジョギングを ＿＿ ことに しました。", kr: "건강을 위해 이번 주부터 조깅을 시작하기로 했습니다." },
+    "場所": { s: "明日の パーティーの ＿＿ は 駅前の レストランに 決まりました。", kr: "내일 파티 장소는 역 앞 레스토랑으로 정해졌습니다." },
+    "走る": { s: "バスに 間に合うように、バス停まで 一生懸命 ＿＿ ました。", kr: "버스 시간에 맞추기 위해 정류장까지 열심히 달렸습니다." },
+    "働く": { s: "叔父は 30年間 同じ 工場で まじめに ＿＿ います。", kr: "삼촌은 30년간 같은 공장에서 성실히 일하고 있습니다." },
+    "早く": { s: "明日は 遠足なので、いつもより ＿＿ 起きなければ なりません。", kr: "내일은 소풍이라 평소보다 일찍 일어나야 합니다." },
+    "光": { s: "カーテンを 開けると、部屋の 中に 太陽の ＿＿ が 入って きました。", kr: "커튼을 열자 방 안으로 태양 빛이 들어왔습니다." },
+    "光る": { s: "暗い 海の 上で 遠くの 灯台が 明るく ＿＿ います。", kr: "어두운 바다 위에서 멀리 있는 등대가 밝게 빛나고 있습니다." },
+    "病院": { s: "熱が 38度も あるので、近くの ＿＿ へ 行って きます。", kr: "열이 38도나 있어서 근처 병원에 다녀오겠습니다." },
+    "広い": { s: "新しい オフィスは 窓が 大きくて とても ＿＿ です。", kr: "새로운 사무실은 창문이 크고 매우 넓습니다." },
+    "服": { s: "明日の 面接に 着て 行く ＿＿ を デパートで 買いました。", kr: "내일 면접에 입고 갈 옷을 백화점에서 샀습니다." },
+    "冬": { s: "この 地域は ＿＿ に なると 毎日 冷たい 風が 吹きます。", kr: "이 지역은 겨울이 되면 매일 찬 바람이 붑니다." },
+    "古い": { s: "京都には 1000年 前の ＿＿ お寺が たくさん 残って います。", kr: "교토에는 1000년 전의 오래된 절이 많이 남아 있습니다." },
+    "文": { s: "この 単語を 使って、短い ＿＿ を 作って ください。", kr: "이 단어를 사용해서 짧은 문장을 만들어 주세요." },
+    "待つ": { s: "改札の 前で 20分 ぐらい 彼女が 来るのを ＿＿ ました。", kr: "개찰구 앞에서 20분 정도 그녀가 오기를 기다렸습니다." },
+    "持つ": { s: "両手に 重い 荷物を ＿＿ 階段を 上るのは 大変です。", kr: "양손에 무거운 짐을 들고 계단을 오르는 것은 힘듭니다." },
+    "寒い": { s: "今朝は 急に ＿＿ なったので、厚い セーターを 出しました。", kr: "오늘 아침은 갑자기 추워져서 두꺼운 스웨터를 꺼냈습니다." },
+    "食堂": { s: "12時に なると、会社の ＿＿ は 社員で いっぱいに なります。", kr: "12시가 되면 회사 식당은 사원들로 가득 찹니다." },
+    "調べる": { s: "レポートを 書く ために、図書館で 古い 資料を ＿＿ ました。", kr: "리포트를 쓰기 위해 도서관에서 오래된 자료를 조사했습니다." },
+    "親切だ": { s: "道に 迷った とき、町の 人が とても ＿＿ 案内して くれました。", kr: "길을 잃었을 때 동네 사람이 매우 친절하게 안내해 주었습니다." },
+    "説明": { s: "ルールが 少し 複雑なので、もう 一度 詳しく ＿＿ します。", kr: "규칙이 조금 복잡해서 한 번 더 자세히 설명하겠습니다." },
+    "作る": { s: "日曜日の 朝は わたしが 家族の 朝ご飯を ＿＿ います。", kr: "일요일 아침은 내가 가족의 아침밥을 만들고 있습니다." },
+    "遠い": { s: "空港から ホテルまで かなり ＿＿ ので、リムジンバスに 乗りましょう。", kr: "공항에서 호텔까지 꽤 멀어서 리무진 버스를 탑시다." },
+    "特別だ": { s: "卒業式は 学生に とって 忘れられない ＿＿ 思い出に なります。", kr: "졸업식은 학생에게 잊을 수 없는 특별한 추억이 됩니다." },
+    "入院": { s: "祖父は 手術を 受ける ために、来週から 1週間 ＿＿ します。", kr: "할아버지는 수술을 받기 위해 다음 주부터 일주일간 입원합니다." },
+    "青い": { s: "台風が 過ぎて、今日は 雲 ひとつ ない ＿＿ 空が 広がって います。", kr: "태풍이 지나가고 오늘은 구름 한 점 없는 파란 하늘이 펼쳐져 있습니다." },
+    "集まる": { s: "祭りの 日には 広場の まわりに 大勢の 見物客が ＿＿ ます。", kr: "축제 날에는 광장 주변에 많은 구경꾼이 모입니다." },
+    "洗う": { s: "外から 帰ったら、まず 石けんで きれいに 手を ＿＿ ください。", kr: "밖에서 돌아오면 우선 비누로 깨끗이 손을 씻으세요." },
+    "歩く": { s: "天気が いいので、ひと駅 まえで 降りて 家まで ＿＿ ました。", kr: "날씨가 좋아서 한 정거장 앞에서 내려 집까지 걸었습니다." },
+    "医者": { s: "けがが 治るまで 運動しないように ＿＿ に 注意されました。", kr: "부상이 나을 때까지 운동하지 않도록 의사에게 주의 받았습니다." },
+    "動く": { s: "電池を 新しい ものに 変えたら、時計の 針が また ＿＿ 出しました。", kr: "건전지를 새것으로 바꿨더니 시계바늘이 다시 움직이기 시작했습니다." },
+    "売る": { s: "使わなくなった 古い カメラを リサイクルショップに ＿＿ ました。", kr: "쓰지 않게 된 오래된 카메라를 중고매장에 팔았습니다." },
+    "屋上": { s: "夏には デパートの ＿＿ で 花火大会を 見ることが できます。", kr: "여름에는 백화점 옥상에서 불꽃놀이 대회를 볼 수 있습니다." },
+    "貸す": { s: "筆記用具を 忘れた 友だちに ボールペンを 1本 ＿＿ あげました。", kr: "필기구를 잊은 친구에게 볼펜을 한 자루 빌려주었습니다." },
+    "黒い": { s: "遠くに ＿＿ 雲が 見えたと 思ったら、急に 雨が 降り出しました。", kr: "멀리 검은 구름이 보인다고 생각했더니 갑자기 비가 내리기 시작했습니다." },
+    "経験": { s: "外国で 一人暮らしを した ことは、わたしに とって いい ＿＿ です。", kr: "외국에서 자취를 한 것은 나에게 좋은 경험입니다." },
+    "交通": { s: "この 近くは 地下鉄も バスも 多くて、＿＿ が とても 便利です。", kr: "이 근처는 지하철도 버스도 많아서 교통이 매우 편리합니다." },
+    "氷": { s: "暑いので、ジュースに ＿＿ を たくさん 入れて 冷たく しました。", kr: "더워서 주스에 얼음을 많이 넣어 차갑게 했습니다." },
+    "試合": { s: "明日の サッカーの ＿＿ に 勝つ ために、毎日 練習して います。", kr: "내일 축구 시합에 이기기 위해 매일 연습하고 있습니다." },
+    "食料品": { s: "台風が 来る 前に、水や パンなどの ＿＿ を 買いに 行きました。", kr: "태풍이 오기 전에 물이나 빵 등의 식료품을 사러 갔습니다." },
+    "好きだ": { s: "わたしは 甘い お菓子よりも からい 料理の ほうが ＿＿ です。", kr: "나는 단 과자보다 매운 요리 쪽을 좋아합니다." },
+    "進む": { s: "新しい 橋の 工事は 予定どおり 順調に ＿＿ います。", kr: "새로운 다리 공사는 예정대로 순조롭게 진행되고 있습니다." },
+    "開ける": { s: "部屋の 空気を 入れかえる ために、窓を 大きく ＿＿ ました。", kr: "방 공기를 환기하기 위해 창문을 크게 열었습니다." },
+    "暑い": { s: "きのうは 35度も あって、今年 いちばん ＿＿ 日でした。", kr: "어제는 35도나 되어서 올해 가장 더운 날이었습니다." },
+    "歌": { s: "子どもたちが ピアノに 合わせて 楽しそうに ＿＿ を うたって います。", kr: "아이들이 피아노에 맞춰 즐겁게 노래를 부르고 있습니다." },
+    "海": { s: "沖縄の ＿＿ は 水が とても きれいで、魚が よく 見えます。", kr: "오키나와의 바다는 물이 매우 깨끗해서 물고기가 잘 보입니다." },
+    "運転": { s: "雪の 日に 車を ＿＿ する ときは、スピードを 出さないで ください。", kr: "눈 오는 날에 차를 운전할 때는 속도를 내지 마세요." },
+    "映画館": { s: "週末は 駅前の 新しい ＿＿ で 人気の アニメを 見ました。", kr: "주말에는 역 앞의 새 영화관에서 인기 애니메이션을 봤습니다." },
+    "音": { s: "隣の 部屋から ピアノを 練習する きれいな ＿＿ が 聞こえます。", kr: "옆방에서 피아노를 연습하는 아름다운 소리가 들립니다." },
+    "思い出す": { s: "この 写真を 見る たびに、高校時代の 友だちを ＿＿ ます。", kr: "이 사진을 볼 때마다 고등학교 시절 친구가 떠오릅니다." },
+    "思う": { s: "来年の 試験は 今年よりも 難しく なると ＿＿ ます。", kr: "내년 시험은 올해보다 어려워질 것이라고 생각합니다." },
+    "終わる": { s: "会議が 5時に ＿＿ ので、その あと 食事に 行きませんか。", kr: "회의가 5시에 끝나니까 그 후에 식사하러 가지 않겠습니까?" },
+    "風": { s: "今日は 強い ＿＿ が 吹いて いて、帽子が 飛ばされそうに なりました。", kr: "오늘은 강한 바람이 불고 있어서 모자가 날아갈 뻔했습니다." },
+    "借りる": { s: "図書館で ＿＿ 本は 2週間 以内に 返さなければ なりません。", kr: "도서관에서 빌린 책은 2주 이내에 반납해야 합니다." },
+    "授業": { s: "午後の ＿＿ では グループに 分かれて 発表を します。", kr: "오후 수업에서는 그룹으로 나뉘어 발표를 합니다." },
+    "先週": { s: "＿＿ の 金曜日に 注文した 商品が やっと 届きました。", kr: "지난주 금요일에 주문한 상품이 겨우 도착했습니다." },
+    "使う": { s: "料理を 作る ときに ＿＿ 道具を きれいに 片づけました。", kr: "요리를 만들 때 사용한 도구를 깨끗이 정리했습니다." },
+    "習う": { s: "文化センターで 先月から 日本の 伝統的な 踊りを ＿＿ います。", kr: "문화센터에서 지난달부터 일본 전통 무용을 배우고 있습니다." },
+    "眠い": { s: "ゆうべ 遅くまで 映画を 見て いたので、今日は とても ＿＿ です。", kr: "어젯밤 늦게까지 영화를 봐서 오늘은 매우 졸립니다." },
+    "林": { s: "キャンプ場の 近くの ＿＿ で いろいろな 虫を 見つけました。", kr: "캠프장 근처 수풀에서 여러 가지 벌레를 발견했습니다." },
+    "引く": { s: "この ドアは 押すのでは なく、手前に ＿＿ 開けて ください。", kr: "이 문은 미는 것이 아니라 앞쪽으로 당겨서 열어 주세요." },
+    "昼休み": { s: "＿＿ に 銀行へ 行ったら、窓口が すごく 混んで いました。", kr: "점심시간에 은행에 갔더니 창구가 무척 붐볐습니다." },
+    "便利だ": { s: "スマートフォンが あれば、いつでも 地図が 見られて ＿＿ です。", kr: "스마트폰이 있으면 언제든 지도를 볼 수 있어 편리합니다." },
+    "都合": { s: "来週の 水曜日は ＿＿ が 悪いので、別の 日に 変えて いただけますか。", kr: "다음 주 수요일은 형편(사정)이 안 좋아서 다른 날로 바꿔 주시겠습니까?" },
+    "予習": { s: "新しい 単語が 多いので、授業の 前に かならず ＿＿ して きます。", kr: "새로운 단어가 많아서 수업 전에 반드시 예습해 옵니다." }
+};
+
+/* =========================================================================
+   3. 히라가나 ➔ 한국어 발음 자동 변환기 (장음/요음/촉음 자연스럽게 처리)
+   ========================================================================= */
+function hiraganaToKorean(reading) {
+    const clean = reading.replace(/〜/g, '');
+    const youonMap = {
+        'きゃ':'캬','きゅ':'큐','きょ':'쿄','ぎゃ':'갸','ぎゅ':'규','ぎょ':'교',
+        'しゃ':'샤','しゅ':'슈','しょ':'쇼','じゃ':'자','じゅ':'주','じょ':'조',
+        'ちゃ':'차','ちゅ':'추','ちょ':'초','にゃ':'냐','にゅ':'뉴','にょ':'뇨',
+        'ひゃ':'햐','ひゅ':'휴','ひょ':'효','びゃ':'뱌','びゅ':'뷰','びょ':'뵤',
+        'ぴゃ':'퍄','ぴゅ':'퓨','ぴょ':'표','みゃ':'먀','みゅ':'뮤','みょ':'묘',
+        'りゃ':'랴','りゅ':'류','りょ':'료'
+    };
+    const basicMap = {
+        'あ':'아','い':'이','う':'우','え':'에','お':'오',
+        'か':'카','き':'키','く':'쿠','け':'케','こ':'코',
+        'さ':'사','し':'시','す':'스','せ':'세','そ':'소',
+        'た':'타','ち':'치','つ':'츠','て':'테','と':'토',
+        'な':'나','に':'니','ぬ':'누','ね':'네','の':'노',
+        'は':'하','ひ':'히','ふ':'후','へ':'헤','ほ':'호',
+        'ま':'마','み':'미','む':'무','め':'메','も':'모',
+        'や':'야','ゆ':'유','よ':'요',
+        'ら':'라','り':'리','る':'루','れ':'레','ろ':'로',
+        'わ':'와','を':'오','ん':'응',
+        'が':'가','ぎ':'기','ぐ':'구','げ':'게','ご':'고',
+        'ざ':'자','じ':'지','ず':'즈','ぜ':'제','ぞ':'조',
+        'だ':'다','ぢ':'지','づ':'즈','で':'데','ど':'도',
+        'ば':'바','び':'비','ぶ':'부','べ':'베','ぼ':'보',
+        'ぱ':'파','ぴ':'피','ぷ':'푸','ぺ':'페','ぽ':'포',
+        'っ':'ㅅ','ー':'-'
+    };
+
+    let res = '';
+    let i = 0;
+    while (i < clean.length) {
+        if (i + 1 < clean.length && youonMap[clean.substring(i, i + 2)]) {
+            res += youonMap[clean.substring(i, i + 2)];
+            i += 2;
+        } else {
+            res += basicMap[clean[i]] || clean[i];
+            i++;
+        }
+    }
+    return res;
+}
+
+/* =========================================================================
+   4. JLPT N4 실전형 함정 요미가나(Hard 모드) 생성 알고리즘
+   - 정답 요미가나와 비교하여 장음(う) 유무, 탁음/청음 전환, 촉음(っ), 요음 등
+     1~2글자만 미묘하게 다른 매력적인 오답 3개를 정교하게 생성합니다.
+   ========================================================================= */
+function generateHardReadingDistractors(correctReading) {
+    const clean = correctReading.replace(/〜/g, '');
+    const candidates = new Set();
+
+    // 1) 장음(う / い) 추가·제거 변형
+    if (clean.includes('ょう')) candidates.add(clean.replace('ょう', 'ょ'));
+    if (clean.includes('ゅう')) candidates.add(clean.replace('ゅう', 'ゅ'));
+    if (clean.includes('こう')) candidates.add(clean.replace('こう', 'こ'));
+    if (clean.includes('そう')) candidates.add(clean.replace('そう', 'そ'));
+    if (clean.includes('とう')) candidates.add(clean.replace('とう', 'と'));
+    if (clean.includes('おう')) candidates.add(clean.replace('おう', 'お'));
+    if (clean.includes('えい')) candidates.add(clean.replace('えい', 'え'));
+
+    // 단음에 장음 추가
+    if (!clean.includes('ょう') && clean.includes('ょ')) candidates.add(clean.replace('ょ', 'ょう'));
+    if (!clean.includes('ゅう') && clean.includes('ゅ')) candidates.add(clean.replace('ゅ', 'ゅう'));
+    if (clean.includes('こ') && !clean.includes('こう')) candidates.add(clean.replace('こ', 'こう'));
+    if (clean.includes('と') && !clean.includes('とう')) candidates.add(clean.replace('と', 'とう'));
+    if (clean.includes('つ') && !clean.includes('つう')) candidates.add(clean.replace('つ', 'つう'));
+    if (clean.includes('よ') && !clean.includes('よう')) candidates.add(clean.replace('よ', 'よう'));
+
+    // 2) 청음 ↔ 탁음/반탁음 변형
+    const dakutenPairs = [
+        ['か','が'], ['き','ぎ'], ['く','ぐ'], ['け','げ'], ['こ','ご'],
+        ['さ','ざ'], ['し','じ'], ['す','ず'], ['せ','ぜ'], ['そ','ぞ'],
+        ['た','だ'], ['ち','ぢ'], ['つ','づ'], ['て','で'], ['と','ど'],
+        ['は','ば'], ['ひ','び'], ['ふ','ぶ'], ['へ','べ'], ['ほ','ぼ'],
+        ['ば','ぱ'], ['び','ぴ'], ['ぶ','ぷ'], ['べ','ぺ'], ['ぼ','ぽ']
+    ];
+    for (const [a, b] of dakutenPairs) {
+        if (clean.includes(a)) candidates.add(clean.replace(a, b));
+        if (clean.includes(b)) candidates.add(clean.replace(b, a));
+    }
+
+    // 3) 촉음(っ) 추가·제거 및 유사 음절 변형
+    if (clean.includes('っ')) {
+        candidates.add(clean.replace('っ', ''));
+        candidates.add(clean.replace('っ', 'つ'));
+    } else if (clean.length >= 3) {
+        candidates.add(clean[0] + 'っ' + clean.slice(1));
+    }
+
+    // 4) 동사/형용사 어미 및 유사 모음 함정
+    const vowelSwaps = [
+        ['あ','お'], ['い','え'], ['う','お'], ['る','ら'], ['く','ぐ'],
+        ['む','ぬ'], ['し','ち'], ['じ','ち'], ['ゆ','よ'], ['ゃ','あ']
+    ];
+    for (const [v1, v2] of vowelSwaps) {
+        if (clean.includes(v1)) candidates.add(clean.replace(v1, v2));
+        if (clean.includes(v2)) candidates.add(clean.replace(v2, v1));
+    }
+
+    candidates.delete(clean);
+    const result = Array.from(candidates).filter(x => x.length > 0);
+
+    // 만약 후보가 3개 미만이면 끝 글자 변형으로 보충
+    const fallbackSuffixes = ['우', 'る', 'い', 'く', 'ん'];
+    let idx = 0;
+    while (result.length < 3) {
+        const fake = clean.slice(0, -1) + (['あ','い','う','え','お'][idx % 5]);
+        if (fake !== clean && !result.includes(fake)) result.push(fake);
+        idx++;
+    }
+
+    return result.sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+/* =========================================================================
+   5. 데이터 통합, 중복 병합 및 localStorage 상태 관리
+   ========================================================================= */
+const STORAGE_KEY = 'JLPT_N4_INTEGRATED_APP_V1';
+const THEME_KEY = 'JLPT_N4_THEME_MODE';
+
+let savedUserState = {};
+try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) savedUserState = JSON.parse(raw);
+} catch (e) {
+    console.warn('localStorage 로드 실패:', e);
+}
+
+// 중복 단어 병합 (key: 한자_요미가나)
+const mergedMap = new Map();
+RAW_VOCAB_SOURCES.forEach(item => {
+    const key = `${item.k}_${item.r}`;
+    if (!mergedMap.has(key)) {
+        const userRec = savedUserState[key] || { status: 'unmemorized', fav: false };
+        const ctx = CUSTOM_CONTEXT_MAP[item.k] || {
+            s: `この 文の 中で 「${item.k}」と いう 言葉を 正しく 使って います。`,
+            kr: `이 문장 안에서 '${item.k}(${item.m})'라는 말을 바르게 사용하고 있습니다.`
+        };
+        mergedMap.set(key, {
+            id: key,
+            kanji: item.k,
+            reading: item.r,
+            krPron: hiraganaToKorean(item.r),
+            meaning: item.m,
+            years: [item.y],
+            status: userRec.status,
+            fav: Boolean(userRec.fav),
+            exampleJp: ctx.s.replace('＿＿', item.k),
+            quizSentenceJp: ctx.s,
+            exampleKr: ctx.kr
+        });
+    } else {
+        const existing = mergedMap.get(key);
+        if (!existing.years.includes(item.y)) {
+            existing.years.push(item.y);
+        }
+    }
+});
+
+const ALL_VOCAB = Array.from(mergedMap.values());
+
+// 전역 앱 상태
+let currentTab = 'flashcard';
+let favFilterOnly = false;
+let filteredList = [...ALL_VOCAB];
+
+// 플래시카드 상태
+let fcIndex = 0;
+let fcReverseMode = false;
+let fcIsFlipped = false;
+let fcHintVisible = false;
+
+// 단어장 가리기 토글 상태
+let hideReadingMask = false;
+let hideMeaningMask = false;
+
+// 퀴즈 상태
+let quizDifficulty = 'easy';
+let quizQuestions = [];
+let quizWrongQueue = [];
+let quizCurrentIdx = 0;
+let quizCorrectCount = 0;
+let quizAnsweredCount = 0;
+let quizAnsweredCurrent = false;
+
+/* =========================================================================
+   6. 공통 UI 업데이트 & 필터링
+   ========================================================================= */
+function saveState() {
+    const stateObj = {};
+    ALL_VOCAB.forEach(w => {
+        if (w.status !== 'unmemorized' || w.fav) {
+            stateObj[w.id] = { status: w.status, fav: w.fav };
+        }
+    });
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateObj));
+    } catch (e) {
+        console.warn('localStorage 저장 오류:', e);
+    }
+}
+
+function updateHeaderAndProgress() {
+    // 헤더 전체 통계
+    const totalMem = ALL_VOCAB.filter(w => w.status === 'memorized').length;
+    const totalConf = ALL_VOCAB.filter(w => w.status === 'confusing').length;
+    const totalUnmem = ALL_VOCAB.filter(w => w.status === 'unmemorized').length;
+    const totalFav = ALL_VOCAB.filter(w => w.fav).length;
+    const totalDup = ALL_VOCAB.filter(w => w.years.length > 1).length;
+
+    document.getElementById('headerStats').innerHTML = `
+        <div class="stat-pill">📚 통합 단어: ${ALL_VOCAB.length}개 (중복기출 ${totalDup}개)</div>
+        <div class="stat-pill">⭕ 외움: ${totalMem}</div>
+        <div class="stat-pill">❓ 헷갈림: ${totalConf}</div>
+        <div class="stat-pill">📌 미암기: ${totalUnmem}</div>
+        <div class="stat-pill">★ 즐겨찾기: ${totalFav}</div>
+    `;
+
+    // 현재 필터링된 단어들의 학습 진도율 프로그레스 바 계산
+    const count = filteredList.length;
+    if (count === 0) {
+        document.getElementById('masteryLabels').innerHTML = `
+            <span>현재 필터 학습 진도율 (0개)</span>
+            <span>조건에 맞는 단어가 없습니다</span>
+        `;
+        document.getElementById('barSegMem').style.width = '0%';
+        document.getElementById('barSegConf').style.width = '0%';
+        document.getElementById('barSegUnmem').style.width = '0%';
+        return;
+    }
+
+    const fMem = filteredList.filter(w => w.status === 'memorized').length;
+    const fConf = filteredList.filter(w => w.status === 'confusing').length;
+    const fUnmem = filteredList.filter(w => w.status === 'unmemorized').length;
+
+    const pMem = Math.round((fMem / count) * 100);
+    const pConf = Math.round((fConf / count) * 100);
+    const pUnmem = Math.max(0, 100 - pMem - pConf);
+
+    document.getElementById('masteryLabels').innerHTML = `
+        <span>📊 현재 필터 학습 진도율 (총 ${count}개 단어)</span>
+        <span>⭕ 외움 ${fMem}개(${pMem}%) · ❓ 헷갈림 ${fConf}개(${pConf}%) · 📌 미암기 ${fUnmem}개(${pUnmem}%)</span>
+    `;
+    document.getElementById('barSegMem').style.width = `${pMem}%`;
+    document.getElementById('barSegConf').style.width = `${pConf}%`;
+    document.getElementById('barSegUnmem').style.width = `${pUnmem}%`;
+}
+
+function applyFilters() {
+    const yearVal = document.getElementById('yearFilter').value;
+    const statusVal = document.getElementById('statusFilter').value;
+
+    filteredList = ALL_VOCAB.filter(w => {
+        if (yearVal === 'DUP' && w.years.length < 2) return false;
+        if (yearVal !== 'ALL' && yearVal !== 'DUP' && !w.years.includes(yearVal)) return false;
+        if (statusVal !== 'ALL' && w.status !== statusVal) return false;
+        if (favFilterOnly && !w.fav) return false;
+        return true;
+    });
+
+    if (fcIndex >= filteredList.length) fcIndex = 0;
+    fcIsFlipped = false;
+    fcHintVisible = false;
+
+    updateHeaderAndProgress();
+    renderFlashcard();
+    renderVocabTable();
+    startNewQuizSession(false);
+}
+
+function toggleFavFilter() {
+    favFilterOnly = !favFilterOnly;
+    document.getElementById('favFilterBtn').classList.toggle('active', favFilterOnly);
+    applyFilters();
+}
+
+function switchTab(tabName) {
+    currentTab = tabName;
+    ['flashcard', 'vocab', 'quiz'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('active', t === tabName);
+        document.getElementById(`tabBtn-${t}`).classList.toggle('active', t === tabName);
+    });
+    if (tabName === 'flashcard') renderFlashcard();
+    if (tabName === 'vocab') renderVocabTable();
+    if (tabName === 'quiz' && quizQuestions.length === 0) startNewQuizSession(false);
+}
+
+// 기출 연도 및 중복 출제 강조 배지 생성
+function buildBadgesHtml(word, includeStatus = true) {
+    let html = '';
+    if (word.years.length > 1) {
+        html += `<span class="badge badge-dup">[🔥 ${word.years.join(' / ')} 중복 기출]</span>`;
+    } else {
+        html += `<span class="badge badge-year">[${word.years[0]} 기출]</span>`;
+    }
+
+    if (includeStatus) {
+        const statusLabel = {
+            memorized: '⭕ 외움',
+            confusing: '❓ 헷갈림',
+            unmemorized: '📌 미암기'
+        }[word.status];
+        html += `<span class="badge badge-status-${word.status}">${statusLabel}</span>`;
+    }
+    return html;
+}
+
+/* =========================================================================
+   7. 탭 1: 플래시카드 & Web Speech API(TTS)
+   ========================================================================= */
+function renderFlashcard() {
+    const emptyEl = document.getElementById('fcEmptyState');
+    const mainEl = document.getElementById('fcMainArea');
+
+    if (filteredList.length === 0) {
+        emptyEl.style.display = 'block';
+        mainEl.style.display = 'none';
+        document.getElementById('fcProgressFill').style.width = '0%';
+        return;
+    }
+
+    emptyEl.style.display = 'none';
+    mainEl.style.display = 'block';
+
+    if (fcIndex >= filteredList.length) fcIndex = 0;
+    const word = filteredList[fcIndex];
+
+    document.getElementById('fcCard').classList.toggle('is-flipped', fcIsFlipped);
+    document.getElementById('fcProgressFill').style.width = `${((fcIndex + 1) / filteredList.length) * 100}%`;
+    document.getElementById('fcCounter').textContent = `${fcIndex + 1} / ${filteredList.length}`;
+
+    const badgesHtml = buildBadgesHtml(word, true);
+    document.getElementById('fcFrontBadges').innerHTML = badgesHtml;
+    document.getElementById('fcBackBadges').innerHTML = badgesHtml;
+
+    const favBtnFront = document.getElementById('fcFavBtn');
+    const favBtnBack = document.getElementById('fcFavBtnBack');
+    favBtnFront.textContent = word.fav ? '★' : '☆';
+    favBtnBack.textContent = word.fav ? '★' : '☆';
+    favBtnFront.classList.toggle('fav-active', word.fav);
+    favBtnBack.classList.toggle('fav-active', word.fav);
+
+    const frontTextEl = document.getElementById('fcFrontText');
+    const hintContainer = document.getElementById('fcHintContainer');
+    const hintBtn = document.getElementById('fcHintBtn');
+    const hintText = document.getElementById('fcHintText');
+
+    const backKanjiEl = document.getElementById('fcBackKanji');
+    const backReadingEl = document.getElementById('fcBackReading');
+    const backKrPronEl = document.getElementById('fcBackKrPron');
+    const backMeaningEl = document.getElementById('fcBackMeaning');
+    const backExampleEl = document.getElementById('fcBackExample');
+
+    if (!fcReverseMode) {
+        // 기본 모드: 한자 ➔ 뜻/읽기
+        frontTextEl.textContent = word.kanji;
+        frontTextEl.classList.remove('meaning-mode');
+        hintContainer.style.display = 'flex';
+        hintBtn.style.display = fcHintVisible ? 'none' : 'inline-block';
+        hintText.style.display = fcHintVisible ? 'inline-block' : 'none';
+        hintText.textContent = `${word.reading} [${word.krPron}]`;
+
+        backKanjiEl.style.display = 'none';
+        backReadingEl.textContent = word.reading;
+        backKrPronEl.textContent = `[${word.krPron}]`;
+        backMeaningEl.style.display = 'block';
+        backMeaningEl.textContent = word.meaning;
+        backExampleEl.style.display = 'block';
+        backExampleEl.innerHTML = `💡 예문: ${word.exampleJp}<br><span style="font-size:0.8rem;">(${word.exampleKr})</span>`;
+    } else {
+        // 역방향 모드: 뜻 ➔ 한자/읽기
+        frontTextEl.textContent = word.meaning;
+        frontTextEl.classList.add('meaning-mode');
+        hintContainer.style.display = 'none';
+
+        backKanjiEl.style.display = 'block';
+        backKanjiEl.textContent = word.kanji;
+        backReadingEl.textContent = word.reading;
+        backKrPronEl.textContent = `[${word.krPron}]`;
+        backMeaningEl.style.display = 'none';
+        backExampleEl.style.display = 'block';
+        backExampleEl.innerHTML = `💡 예문: ${word.exampleJp}`;
+    }
+
+    // 하단 상태 버튼 활성화 표시
+    document.getElementById('btnStatusMemorized').classList.toggle('active-status', word.status === 'memorized');
+    document.getElementById('btnStatusConfusing').classList.toggle('active-status', word.status === 'confusing');
+    document.getElementById('btnStatusUnmemorized').classList.toggle('active-status', word.status === 'unmemorized');
+}
+
+function toggleFcMode() {
+    fcReverseMode = !fcReverseMode;
+    fcIsFlipped = false;
+    fcHintVisible = false;
+    document.getElementById('fcModeBtn').innerHTML = fcReverseMode
+        ? `🔄 표시 모드: <strong>역방향 (뜻 ➔ 한자/읽기)</strong>`
+        : `🔄 표시 모드: <strong>기본 (한자 ➔ 뜻/읽기)</strong>`;
+    renderFlashcard();
+}
+
+function flipCard() {
+    if (filteredList.length === 0) return;
+    fcIsFlipped = !fcIsFlipped;
+    renderFlashcard();
+}
+
+function showReadingHint() {
+    fcHintVisible = true;
+    renderFlashcard();
+}
+
+function prevCard() {
+    if (filteredList.length === 0) return;
+    fcIndex = (fcIndex - 1 + filteredList.length) % filteredList.length;
+    fcIsFlipped = false;
+    fcHintVisible = false;
+    renderFlashcard();
+}
+
+function nextCard() {
+    if (filteredList.length === 0) return;
+    fcIndex = (fcIndex + 1) % filteredList.length;
+    fcIsFlipped = false;
+    fcHintVisible = false;
+    renderFlashcard();
+}
+
+function shuffleFlashcards() {
+    if (filteredList.length <= 1) return;
+    for (let i = filteredList.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredList[i], filteredList[j]] = [filteredList[j], filteredList[i]];
+    }
+    fcIndex = 0;
+    fcIsFlipped = false;
+    fcHintVisible = false;
+    renderFlashcard();
+}
+
+function toggleCurrentFav() {
+    if (filteredList.length === 0) return;
+    const word = filteredList[fcIndex];
+    word.fav = !word.fav;
+    saveState();
+    updateHeaderAndProgress();
+    renderFlashcard();
+    renderVocabTable();
+}
+
+function setCardStatusAndNext(newStatus) {
+    if (filteredList.length === 0) return;
+    const word = filteredList[fcIndex];
+    word.status = newStatus;
+    saveState();
+
+    const statusFilterVal = document.getElementById('statusFilter').value;
+    if (statusFilterVal !== 'ALL' && statusFilterVal !== newStatus) {
+        applyFilters();
+    } else {
+        updateHeaderAndProgress();
+        renderVocabTable();
+        nextCard();
+    }
+}
+
+function speakJapanese(text) {
+    if (!('speechSynthesis' in window)) {
+        alert('이 브라우저는 음성 합성(TTS)을 지원하지 않습니다.');
+        return;
+    }
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/〜/g, '');
+    const utter = new SpeechSynthesisUtterance(cleanText);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.92;
+    window.speechSynthesis.speak(utter);
+}
+
+function speakCurrentCard() {
+    if (filteredList.length === 0) return;
+    const word = filteredList[fcIndex];
+    speakJapanese(word.reading || word.kanji);
+}
+
+/* =========================================================================
+   8. 탭 2: 단어장 (실시간 검색 & 요미가나/뜻 가리기 토글)
+   ========================================================================= */
+function toggleVocabMask(type) {
+    if (type === 'reading') {
+        hideReadingMask = !hideReadingMask;
+        document.getElementById('btnHideReading').classList.toggle('active', hideReadingMask);
+    } else {
+        hideMeaningMask = !hideMeaningMask;
+        document.getElementById('btnHideMeaning').classList.toggle('active', hideMeaningMask);
+    }
+    renderVocabTable();
+}
+
+function renderVocabTable() {
+    const query = (document.getElementById('vocabSearchInput').value || '').trim().toLowerCase();
+    const tbody = document.getElementById('vocabTableBody');
+
+    const searchedList = filteredList.filter(w => {
+        if (!query) return true;
+        return (
+            w.kanji.toLowerCase().includes(query) ||
+            w.reading.toLowerCase().includes(query) ||
+            w.krPron.toLowerCase().includes(query) ||
+            w.meaning.toLowerCase().includes(query)
+        );
+    });
+
+    document.getElementById('vocabCountLabel').textContent = `총 ${searchedList.length}개`;
+
+    if (searchedList.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align:center; padding:36px; color:var(--text-sub);">
+                    검색 조건에 일치하는 단어가 없습니다.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = searchedList.map(w => {
+        const readingClass = hideReadingMask ? 'masked-cell' : '';
+        const meaningClass = hideMeaningMask ? 'masked-cell' : '';
+        return `
+            <tr>
+                <td style="text-align:center;">
+                    <button class="icon-btn ${w.fav ? 'fav-active' : ''}" style="width:32px; height:32px; font-size:1rem;" onclick="toggleFavById('${w.id}')">
+                        ${w.fav ? '★' : '☆'}
+                    </button>
+                </td>
+                <td style="text-align:center;">
+                    <button class="icon-btn" style="width:32px; height:32px; font-size:0.95rem;" onclick="speakJapanese('${w.reading}')">
+                        🔊
+                    </button>
+                </td>
+                <td class="td-kanji jp-text" lang="ja">${w.kanji}</td>
+                <td>
+                    <div class="${readingClass}" onclick="this.classList.toggle('revealed')" title="클릭하거나 마우스를 올리면 보입니다">
+                        <span class="td-reading jp-text" lang="ja">${w.reading}</span>
+                        <span class="td-kr-pron">[${w.krPron}]</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="${meaningClass} td-meaning" onclick="this.classList.toggle('revealed')" title="클릭하거나 마우스를 올리면 보입니다">
+                        ${w.meaning}
+                    </div>
+                </td>
+                <td>${buildBadgesHtml(w, false)}</td>
+                <td style="text-align:center;">
+                    <div class="mini-status-group">
+                        <button class="mini-status-btn ${w.status === 'memorized' ? 'active-memorized' : ''}" onclick="setStatusById('${w.id}', 'memorized')">외움</button>
+                        <button class="mini-status-btn ${w.status === 'confusing' ? 'active-confusing' : ''}" onclick="setStatusById('${w.id}', 'confusing')">헷갈림</button>
+                        <button class="mini-status-btn ${w.status === 'unmemorized' ? 'active-unmemorized' : ''}" onclick="setStatusById('${w.id}', 'unmemorized')">미암기</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function toggleFavById(id) {
+    const word = ALL_VOCAB.find(w => w.id === id);
+    if (!word) return;
+    word.fav = !word.fav;
+    saveState();
+    applyFilters();
+}
+
+function setStatusById(id, status) {
+    const word = ALL_VOCAB.find(w => w.id === id);
+    if (!word) return;
+    word.status = status;
+    saveState();
+    applyFilters();
+}
+
+/* =========================================================================
+   9. 탭 3: 4지선다 종합 문제 (Easy / Hard 난이도 & 오답 자동 '헷갈림' 연동)
+   ========================================================================= */
+function setQuizDifficulty(diff) {
+    quizDifficulty = diff;
+    document.getElementById('diffEasyBtn').classList.toggle('active', diff === 'easy');
+    document.getElementById('diffHardBtn').classList.toggle('active', diff === 'hard');
+    startNewQuizSession(false);
+}
+
+function buildQuestionObject(word) {
+    const sentenceWithHighlight = word.quizSentenceJp.replace(
+        '＿＿',
+        `<span class="quiz-target-highlight jp-text" lang="ja">${word.kanji}</span>`
+    );
+
+    if (quizDifficulty === 'easy') {
+        // Easy 모드: 문맥 속 밑줄 친 한자의 알맞은 '한국어 뜻' 또는 '명확히 구별되는 요미가나' 고르기
+        const isMeaningMode = Math.random() < 0.5;
+        if (isMeaningMode) {
+            const correct = word.meaning;
+            const otherMeanings = ALL_VOCAB
+                .filter(w => w.meaning !== correct)
+                .map(w => w.meaning)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            const options = [correct, ...otherMeanings].sort(() => Math.random() - 0.5);
+            return {
+                word,
+                promptType: '🌱 [쉬운 난이도] 밑줄 친 한자 단어의 알맞은 한국어 뜻을 고르세요.',
+                sentenceHtml: sentenceWithHighlight,
+                options,
+                correctIndex: options.indexOf(correct)
+            };
+        } else {
+            const correct = word.reading.replace(/〜/g, '');
+            const otherReadings = ALL_VOCAB
+                .filter(w => w.reading.replace(/〜/g, '') !== correct)
+                .map(w => w.reading.replace(/〜/g, ''))
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            const options = [correct, ...otherReadings].sort(() => Math.random() - 0.5);
+            return {
+                word,
+                promptType: '🌱 [쉬운 난이도] 밑줄 친 한자의 올바른 요미가나(읽기)를 고르세요.',
+                sentenceHtml: sentenceWithHighlight,
+                options,
+                correctIndex: options.indexOf(correct)
+            };
+        }
+    } else {
+        // Hard 모드: JLPT 실전 함정 요미가나 (장음/탁음/촉음/요음 등 1~2글자 차이 오답)
+        const correct = word.reading.replace(/〜/g, '');
+        const distractors = generateHardReadingDistractors(correct);
+        const options = [correct, ...distractors].sort(() => Math.random() - 0.5);
+        return {
+            word,
+            promptType: '🔥 [고난도 JLPT 실전] 장음·탁음·촉음 함정에 주의하여 밑줄 친 한자의 정확한 요미가나를 고르세요.',
+            sentenceHtml: sentenceWithHighlight,
+            options,
+            correctIndex: options.indexOf(correct)
+        };
+    }
+}
+
+function startNewQuizSession(retryWrongOnly = false) {
+    const sourcePool = retryWrongOnly ? [...quizWrongQueue] : [...filteredList];
+    const container = document.getElementById('quizMainArea');
+
+    if (sourcePool.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="border:none; padding:24px;">
+                <h3>출제할 수 있는 단어가 없습니다.</h3>
+                <p style="margin-top:8px;">상단 필터를 변경해 단어를 선택해 주세요.</p>
+            </div>
+        `;
+        document.getElementById('quizScoreBadge').textContent = `정답률: 0 / 0 (0%)`;
+        return;
+    }
+
+    quizQuestions = sourcePool
+        .sort(() => Math.random() - 0.5)
+        .map(w => buildQuestionObject(w));
+
+    quizWrongQueue = [];
+    quizCurrentIdx = 0;
+    quizCorrectCount = 0;
+    quizAnsweredCount = 0;
+    quizAnsweredCurrent = false;
+    updateQuizScoreBadge();
+    renderCurrentQuizQuestion();
+}
+
+function updateQuizScoreBadge() {
+    const pct = quizAnsweredCount === 0 ? 0 : Math.round((quizCorrectCount / quizAnsweredCount) * 100);
+    document.getElementById('quizScoreBadge').textContent = `정답률: ${quizCorrectCount} / ${quizAnsweredCount} (${pct}%)`;
+}
+
+function renderCurrentQuizQuestion() {
+    const container = document.getElementById('quizMainArea');
+
+    if (quizCurrentIdx >= quizQuestions.length) {
+        const pct = quizAnsweredCount === 0 ? 0 : Math.round((quizCorrectCount / quizAnsweredCount) * 100);
+        const wrongCount = quizWrongQueue.length;
+
+        container.innerHTML = `
+            <div style="text-align:center; padding: 20px 10px;">
+                <h2 style="font-size:1.6rem; margin-bottom:10px;">🎉 퀴즈 세션 완료!</h2>
+                <p style="font-size:1.1rem; font-weight:700; color:var(--primary); margin-bottom:8px;">
+                    최종 점수: ${quizCorrectCount} / ${quizQuestions.length} (${pct}%)
+                </p>
+                <p style="font-size:0.9rem; color:var(--text-sub); margin-bottom:24px;">
+                    ${wrongCount > 0
+                        ? `틀린 ${wrongCount}개의 단어는 복습을 위해 자동으로 [❓ 헷갈리는 단어]로 분류되었습니다.`
+                        : `모든 문제를 완벽하게 맞히셨습니다!`}
+                </p>
+                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    ${wrongCount > 0 ? `
+                        <button class="nav-btn" style="max-width:260px; background:var(--warning); color:white; border-color:var(--warning);" onclick="startNewQuizSession(true)">
+                            🔁 틀린 문제만 다시 풀기 (${wrongCount}문제)
+                        </button>
+                    ` : ''}
+                    <button class="nav-btn" style="max-width:240px;" onclick="startNewQuizSession(false)">
+                        🔄 전체 문제 새로 풀기
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const q = quizQuestions[quizCurrentIdx];
+    container.innerHTML = `
+        <div class="quiz-meta-top">
+            <span>문제 ${quizCurrentIdx + 1} / ${quizQuestions.length}</span>
+            <div>${buildBadgesHtml(q.word, true)}</div>
+        </div>
+
+        <div class="quiz-sentence-box">
+            <div class="quiz-question-type">${q.promptType}</div>
+            <div class="quiz-sentence jp-text" lang="ja">${q.sentenceHtml}</div>
+        </div>
+
+        <div class="quiz-options-grid">
+            ${q.options.map((opt, idx) => `
+                <button class="quiz-opt-btn jp-text" id="quizOpt-${idx}" onclick="submitQuizAnswer(${idx})">
+                    <span style="color:var(--primary);">${idx + 1}.</span>
+                    <span>${opt}</span>
+                </button>
+            `).join('')}
+        </div>
+
+        <div class="quiz-feedback-box" id="quizFeedbackBox"></div>
+    `;
+}
+
+function submitQuizAnswer(selectedIndex) {
+    if (quizAnsweredCurrent) return;
+    quizAnsweredCurrent = true;
+    quizAnsweredCount++;
+
+    const q = quizQuestions[quizCurrentIdx];
+    const isCorrect = selectedIndex === q.correctIndex;
+
+    if (isCorrect) {
+        quizCorrectCount++;
+    } else {
+        // 틀린 문제는 자동으로 해당 단어의 암기 상태를 '헷갈리는 단어'로 변경
+        q.word.status = 'confusing';
+        if (!quizWrongQueue.some(w => w.id === q.word.id)) {
+            quizWrongQueue.push(q.word);
+        }
+        saveState();
+        updateHeaderAndProgress();
+        renderVocabTable();
+    }
+
+    q.options.forEach((_, idx) => {
+        const btn = document.getElementById(`quizOpt-${idx}`);
+        btn.disabled = true;
+        if (idx === q.correctIndex) btn.classList.add('correct');
+        if (idx === selectedIndex && !isCorrect) btn.classList.add('wrong');
+    });
+
+    updateQuizScoreBadge();
+
+    const fb = document.getElementById('quizFeedbackBox');
+    fb.classList.add('show');
+    fb.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+            <div>
+                <div style="font-size:1.1rem; font-weight:800; color:${isCorrect ? 'var(--success)' : 'var(--danger)'};">
+                    ${isCorrect ? '⭕ 정답입니다!' : `❌ 오답입니다! (정답: ${q.correctIndex + 1}번 ${q.options[q.correctIndex]})`}
+                </div>
+                ${!isCorrect ? `<div class="auto-confusing-alert">⚡ 오답 자동 연동: '${q.word.kanji}' 단어가 [❓ 헷갈리는 단어]로 자동 등록되었습니다.</div>` : ''}
+                <div style="margin-top:10px; font-size:0.92rem;">
+                    <strong>해설:</strong>
+                    <span class="jp-text" lang="ja" style="font-weight:800; color:var(--primary);">${q.word.kanji} (${q.word.reading})</span>
+                    [${q.word.krPron}] — <strong>${q.word.meaning}</strong>
+                    <button class="icon-btn" style="display:inline-flex; width:28px; height:28px; font-size:0.85rem; margin-left:6px; vertical-align:middle;" onclick="speakJapanese('${q.word.reading}')">🔊</button>
+                </div>
+                <div style="margin-top:4px; font-size:0.84rem; color:var(--text-sub);">
+                    해석: ${q.word.exampleKr} · 출제이력: ${q.word.years.join(', ')}
+                </div>
+            </div>
+            <button class="nav-btn" style="flex:0 0 auto; padding:10px 22px; background:var(--primary); color:white; border-color:var(--primary);" onclick="nextQuizQuestion()">
+                다음 문제 ▶
+            </button>
+        </div>
+    `;
+}
+
+function nextQuizQuestion() {
+    quizCurrentIdx++;
+    quizAnsweredCurrent = false;
+    renderCurrentQuizQuestion();
+}
+
+/* =========================================================================
+   10. 다크 모드 & 데이터 백업/복구 & 키보드 단축키
+   ========================================================================= */
+function initTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggleBtn').innerHTML = '☀️ 라이트 모드';
+    }
+}
+
+function toggleDarkMode() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem(THEME_KEY, 'light');
+        document.getElementById('themeToggleBtn').innerHTML = '🌙 다크 모드';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem(THEME_KEY, 'dark');
+        document.getElementById('themeToggleBtn').innerHTML = '☀️ 라이트 모드';
+    }
+}
+
+function exportStudyData() {
+    const backupPayload = {
+        exportedAt: new Date().toISOString(),
+        records: {}
+    };
+    ALL_VOCAB.forEach(w => {
+        backupPayload.records[w.id] = { status: w.status, fav: w.fav };
+    });
+
+    const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `jlpt_n4_study_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importStudyData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            const records = parsed.records || parsed;
+            let count = 0;
+            ALL_VOCAB.forEach(w => {
+                if (records[w.id]) {
+                    w.status = records[w.id].status || 'unmemorized';
+                    w.fav = Boolean(records[w.id].fav);
+                    count++;
+                }
+            });
+            saveState();
+            applyFilters();
+            alert(`학습 기록 복구 완료! (${count}개 단어 상태 반영)`);
+        } catch (err) {
+            alert('유효한 JSON 백업 파일이 아닙니다.');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function resetAllUserData() {
+    if (!confirm('모든 단어의 암기 상태와 즐겨찾기 기록을 초기화하시겠습니까?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    ALL_VOCAB.forEach(w => {
+        w.status = 'unmemorized';
+        w.fav = false;
+    });
+    applyFilters();
+}
+
+// 키보드 단축키 이벤트 리스너
+document.addEventListener('keydown', (e) => {
+    // 검색창 입력 중일 때는 단축키 무시
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+    if (currentTab === 'flashcard') {
+        if (e.code === 'Space' || e.code === 'Enter') {
+            e.preventDefault();
+            flipCard();
+        } else if (e.code === 'ArrowLeft') {
+            e.preventDefault();
+            prevCard();
+        } else if (e.code === 'ArrowRight') {
+            e.preventDefault();
+            nextCard();
+        } else if (e.key === 'h' || e.key === 'H') {
+            if (!fcReverseMode && !fcIsFlipped) {
+                e.preventDefault();
+                showReadingHint();
+            }
+        } else if (e.key === 'v' || e.key === 'V') {
+            e.preventDefault();
+            speakCurrentCard();
+        } else if (e.key === 's' || e.key === 'S') {
+            e.preventDefault();
+            toggleCurrentFav();
+        } else if (e.key === '1') {
+            e.preventDefault();
+            setCardStatusAndNext('memorized');
+        } else if (e.key === '2') {
+            e.preventDefault();
+            setCardStatusAndNext('confusing');
+        } else if (e.key === '3') {
+            e.preventDefault();
+            setCardStatusAndNext('unmemorized');
+        }
+    }
+});
+
+// 초기 실행
+initTheme();
+applyFilters();
+</script>
+</body>
+</html>
